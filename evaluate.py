@@ -27,7 +27,7 @@ def evaluate():
 
     # Test set — no augmentation (train=False), since evaluation should
     # reflect the model's performance on real, unmodified data.
-    test_dataset = BloodMNISTDataset("blood_test_images_{image_size}.npy", "blood_test_labels_{image_size}.npy", train=False)
+    test_dataset = BloodMNISTDataset(f"blood_test_images_{image_size}.npy", f"blood_test_labels_{image_size}.npy", train=False)
     test_loader = DataLoader(test_dataset, batch_size=100, shuffle=False)
 
     # Load the trained weights into a fresh model instance
