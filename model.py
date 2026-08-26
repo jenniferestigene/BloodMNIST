@@ -42,7 +42,7 @@ class BloodCellCNN(nn.Module):
         self.dropout = nn.Dropout(p=0.3)
 
         # Flattened dimension: 128 channels x 3 x 3 spatial = 1,152
-        self.fc1 = nn.Linear(in_features=128 * 3 * 3, out_features=512)
+        self.fc1 = nn.Linear(in_features=128 * 8 * 8, out_features=512)
         self.fc2 = nn.Linear(in_features=512, out_features=num_classes)
 
 
@@ -77,6 +77,6 @@ class BloodCellCNN(nn.Module):
 
 if __name__ == "__main__":
     model = BloodCellCNN(num_classes=8)
-    dummy_input = torch.randn(4, 3, 28, 28)
+    dummy_input = torch.randn(4, 3, 64, 64)
     output = model(dummy_input)
     print(f"Output shape: {output.shape}")
