@@ -106,6 +106,6 @@ if __name__ == "__main__":
         np.save(f"blood_{split}_labels_{image_size}.npy", labels)
 
     
-    train_labels = np.load("blood_train_labels_{image_size}.npy")
-    save_class_distribution_plot(labels, "assets/class_distribution.png")
+    train_labels = np.load(f"blood_train_labels_{image_size}.npy")
+    save_class_distribution_plot(train_labels, "assets/class_distribution.png")
 
