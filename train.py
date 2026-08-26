@@ -111,7 +111,7 @@ def train():
     model.to(device)
 
     # Weighted loss, corrected for class imbalance (see compute_class_weights)
-    train_labels = np.load("blood_train_labels_{image_size}.npy")
+    train_labels = np.load(f"blood_train_labels_{image_size}.npy")
     class_weights = compute_class_weights(train_labels).to(device)
     criterion = nn.CrossEntropyLoss(weight=class_weights)
 
