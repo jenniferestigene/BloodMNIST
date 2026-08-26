@@ -26,13 +26,14 @@ CLASS_NAMES = [
     "basophil",
     "eosinophil",
     "erythroblast",
-    "imature_granulocyte",
+    "immature_granulocyte",
     "lymphocyte",
     "monocyte",
     "neutrophil",
-    "platalet",
+    "platelet",
 ]
 
+image_size = 64
 
 def load_bloodmnist(split: str):
     """
@@ -49,7 +50,7 @@ def load_bloodmnist(split: str):
     """
 
     # download=True caches the .npz locally, so this only fetches from the network once, not on every run
-    dataset = BloodMNIST(split=split, download=True)
+    dataset = BloodMNIST(split=split, download=True, size=image_size)
 
     # Squezing it down to (N,) to match what CrossEntropyLoss expects later
     images = dataset.imgs
@@ -101,8 +102,8 @@ if __name__ == "__main__":
         print(f"[{split}] images: {images.shape}, dtype: {images.dtype} | "
               f"labels: {labels.shape}, dtype: {labels.dtype}")
 
-        np.save(f"blood_{split}_images.npy", images)
-        np.save(f"blood_{split}_labels.npy", labels)
+        np.save(f"blood_{split}_images_{image_size}.npy", images)
+        np.save(f"blood_{split}_labels_{image_size}.npy", labels)
 
     
     train_labels = np.load("blood_train_labels.npy")
