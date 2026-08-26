@@ -135,43 +135,43 @@ def train():
             train_correct += (predictions == labels).sum().item()
             train_total += labels.size(0)
 
-    train_loss /= train_total
-    train_acc = train_correct / train_total
+        train_loss /= train_total
+        train_acc = train_correct / train_total
 
-    # Validation
-    model.eval()
-    val_loss, val_correct, val_total = 0.00, 0, 0
-
-
-    with torch.no_grad():
-        for images, labels in val_loader:
-            images, labels = images.to(device), labels.to(device)
-
-            outputs = model(images)
-            loss = criterion(outputs, labels)
-
-            val_loss += loss.item() * images.size(0)
-            predictions = outputs.argmax(dim=1)
-            val_correct += (predictions == labels).sum().item()
-            val_total += labels.size(0)
-
-    val_loss /= val_total
-    val_acc = val_correct /val_total
-
-    print(f"Epoch {epoch:2d}/{num_epochs} | "
-          f"train_loss: {train_loss:.4f} train_acc: {train_acc:.4f} | "
-          f"val_loss: {val_loss:.4f} val_acc: {val_acc:.4f}")
-
-    log_rows.append({
-        "epoch": epoch,
-        "train_loss": train_loss,
-        "train_acc": train_acc,
-        "val_loss": val_loss,
-        "val_acc": val_acc,
-    })
+        # Validation
+        model.eval()
+        val_loss, val_correct, val_total = 0.00, 0, 0
 
 
-# Write training log to CSV
+        with torch.no_grad():
+            for images, labels in val_loader:
+                images, labels = images.to(device), labels.to(device)
+
+                outputs = model(images)
+                loss = criterion(outputs, labels)
+
+                val_loss += loss.item() * images.size(0)
+                predictions = outputs.argmax(dim=1)
+                val_correct += (predictions == labels).sum().item()
+                val_total += labels.size(0)
+
+        val_loss /= val_total
+        val_acc = val_correct /val_total
+
+        print(f"Epoch {epoch:2d}/{num_epochs} | "
+              f"train_loss: {train_loss:.4f} train_acc: {train_acc:.4f} | "
+              f"val_loss: {val_loss:.4f} val_acc: {val_acc:.4f}")
+
+        log_rows.append({
+            "epoch": epoch,
+            "train_loss": train_loss,
+            "train_acc": train_acc,
+            "val_loss": val_loss,
+            "val_acc": val_acc,
+        })
+
+
+    # Write training log to CSV
     with open("training_log.csv", "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["epoch", "train_loss", "train_acc", "val_loss", "val_acc"])
         writer.writeheader()
