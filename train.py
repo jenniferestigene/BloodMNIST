@@ -16,12 +16,13 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 
 from model import BloodCellCNN
 
-
+image_size = 64
 
 class BloodMNISTDataset(Dataset):
     """
@@ -94,8 +95,13 @@ def train():
     print(f"Using device: {device}")
 
     # Datasets and loaders
-    train_dataset = BloodMNISTDataset("blood_train_images.npy", "blood_train_labels.npy", train=True)
-    val_dataset = BloodMNISTDataset("blood_val_images.npy", "blood_val_labels.npy", train=False)
+    train_dataset = BloodMNISTDataset(
+        f"blood_train_images_{image_size}.npy", f"blood_train_labels_{image_size}.npy", train=True
+    )
+    val_dataset = BloodMNISTDataset(
+        f"blood_val_images_{image_size}.npy", f"blood_val_labels_{image_size}.npy", train=False
+    )
+
 
     train_loader = DataLoader(train_dataset, batch_size=100, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=100, shuffle=False)
@@ -105,12 +111,15 @@ def train():
     model.to(device)
 
     # Weighted loss, corrected for class imbalance (see compute_class_weights)
-    train_labels = np.load("blood_train_labels.npy")
+    train_labels = np.load("blood_train_labels_{image_size}.npy")
     class_weights = compute_class_weights(train_labels).to(device)
     criterion = nn.CrossEntropyLoss(weight=class_weights)
 
     # Adam optimizer
     optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+    # LR Scheduler
+    scheduler = ReduceLROnPlateau(optimizer, mode="min", factor=0.1, patience=3)
 
     # Logging 
     log_rows = []
@@ -158,9 +167,16 @@ def train():
         val_loss /= val_total
         val_acc = val_correct /val_total
 
+        # Step the scheduler
+        scheduler.step(val_loss)
+
+        # Read current LR for logging
+        current_lr = optimizer.param_groups[0]["lr"]
+
         print(f"Epoch {epoch:2d}/{num_epochs} | "
               f"train_loss: {train_loss:.4f} train_acc: {train_acc:.4f} | "
-              f"val_loss: {val_loss:.4f} val_acc: {val_acc:.4f}")
+              f"val_loss: {val_loss:.4f} val_acc: {val_acc:.4f} | "
+              f"lr: {current_lr:.6f}")
 
         log_rows.append({
             "epoch": epoch,
@@ -168,12 +184,15 @@ def train():
             "train_acc": train_acc,
             "val_loss": val_loss,
             "val_acc": val_acc,
+            "lr": current_lr,
         })
 
 
     # Write training log to CSV
     with open("training_log.csv", "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["epoch", "train_loss", "train_acc", "val_loss", "val_acc"])
+        writer = csv.DictWriter(f, 
+                                fieldnames=["epoch", "train_loss", "train_acc", "val_loss", "val_acc", "lr"],
+                                )
         writer.writeheader()
         writer.writerows(log_rows)
 
