@@ -13,7 +13,7 @@ import torch.nn as nn
 
 class BloodCellCNN(nn.Module):
     """
-    3-layer CNN for 8-class blood cell classification on 28x28 
+    3-layer CNN for 8-class blood cell classification on 64x64 
     RGB microscopy images (BloodMNIST).
 
     Uses kernel_size=3 with padding=1 in each conv layer.
